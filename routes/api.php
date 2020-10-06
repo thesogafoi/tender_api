@@ -87,6 +87,7 @@ Route::delete('subscription/{subscription}', 'Api\SubscriptionController@delete'
 // Client Dashboard Controller
 
 Route::post('client-detail/create', 'Api\ClientDetailController@create');
+Route::get('client-detail/index', 'Api\ClientDetailController@index');
 
 /*************************************************************************************************** */
 
