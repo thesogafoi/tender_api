@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\ClientDetail;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Morilog\Jalali\Jalalian;
 
 class ClientDetailController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth']);
+//        $this->middleware(['auth']);
     }
 
     public function create(Request $request)
@@ -37,11 +39,25 @@ class ClientDetailController extends Controller
             $temp["client_name"] = $user_detail->user->name;
             $temp["company_name"] = $user_detail->company_name;
             $temp["mobile"] = $user_detail->user->mobile;
-            $temp["register_date"] = $user_detail->user->created_at;
+            $temp["register_date"] = Jalalian::fromCarbon($user_detail->user->created_at)->format('Y-m-d');
             $temp["user_type"] = $user_detail->type;
             $temp["tel"] = $user_detail->phone;
             array_push($result, $temp);
         }
+        return $result;
+    }
+    public function show(Request $request){
+
+        $user_detail = ClientDetail::query()->where("id" , "=" , $request["id"])->first();
+
+        $result["client_code"] = $user_detail->user->id;
+        $result["client_name"] = $user_detail->user->name;
+        $result["company_name"] = $user_detail->company_name;
+        $result["mobile"] = $user_detail->user->mobile;
+        $result["register_date"] =Jalalian::fromCarbon($user_detail->user->created_at)->format('Y-m-d');
+        $result["user_type"] = $user_detail->type;
+        $result["tel"] = $user_detail->phone;
+
         return $result;
     }
 }
