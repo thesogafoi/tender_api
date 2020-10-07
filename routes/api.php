@@ -92,6 +92,16 @@ Route::get('client-detail/show', 'Api\ClientDetailController@show');
 
 /*************************************************************************************************** */
 
+// Banner Controller
+Route::post('banner/create', 'Api\BannerController@create');
+Route::get('banner/index-app', 'Api\BannerController@index_app');
+Route::get('banner/index-back-office', 'Api\BannerController@index_back_office');
+Route::post('banner/click', 'Api\BannerController@click_banner');
+Route::post('banner/save/image/{id}', 'Api\BannerController@saveImage');
+
+
+/*************************************************************************************************** */
+
 // Site Controller
 Route::get('site/advertise', 'Api\Site\SiteController@getAdvertises');
 Route::get('site/parent/workgroups', 'Api\Site\SiteController@getWorkGroupParents');
