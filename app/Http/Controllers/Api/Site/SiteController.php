@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Site;
 
 use App\Advertise;
+use App\Banner;
 use App\Filters\AdvertiseFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdvertiseIndexResource;
@@ -11,7 +12,10 @@ use App\Http\Resources\ShowAdvertiseResourceInSite;
 use App\Http\Resources\SubscriptionResource;
 use App\Subscription;
 use App\WorkGroup;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Morilog\Jalali\Jalalian;
 
 class SiteController extends Controller
 {
@@ -36,8 +40,8 @@ class SiteController extends Controller
     public function getAdvertises(Request $request, AdvertiseFilter $filters)
     {
         if ($request->get_last_five == true) {
-            return AdvertiseIndexResource::collection(Advertise::where('status', 1)->take(10)
-            ->get()->sortByDesc('id'));
+            return AdvertiseIndexResource::collection(Advertise::where('status', 1)->orderBy('id', 'desc')->take(10)
+            ->get());
         }
         if ($request->searchTerm != null) {
             if ($request->searchType == null) {
@@ -80,6 +84,23 @@ class SiteController extends Controller
         }
 
         return SubscriptionResource::collection($subscriptions);
+    }
+
+    public function index_app()
+    {
+        $banners = Banner::query()
+            ->whereDate('start_date', '<=', Carbon::now()->toDateString())
+            ->whereDate('expire_date', '>', Carbon::now()->toDateString())->get();
+        if (count($banners) != 0) {
+            foreach ($banners as $banner) {
+                $banner->expire_date = Jalalian::forge($banner->expire_date)->format('Y-m-d');
+                $banner->start_date = Jalalian::forge($banner->start_date)->format('Y-m-d');
+            }
+
+            return new JsonResponse($banners);
+        }
+
+        return new JsonResponse(['message' => 'There is no banner']);
     }
 
     public function relatedAdvertises(Advertise $advertise)

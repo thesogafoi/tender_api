@@ -9,13 +9,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Morilog\Jalali\Jalalian;
-use function GuzzleHttp\Psr7\str;
 
 class BannerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'superadmin']);
+        // $this->middleware(['auth', 'superadmin']);
     }
 
     /**
@@ -26,17 +25,18 @@ class BannerController extends Controller
     public function index_app()
     {
         $banners = Banner::query()
-            ->whereDate("start_date", "<=", Carbon::now()->toDateString())
-            ->whereDate("expire_date", ">", Carbon::now()->toDateString())->get();
+            ->whereDate('start_date', '<=', Carbon::now()->toDateString())
+            ->whereDate('expire_date', '>', Carbon::now()->toDateString())->get();
         if (count($banners) != 0) {
             foreach ($banners as $banner) {
                 $banner->expire_date = Jalalian::fromCarbon(Carbon::parse($banner->expire_date))->format('Y-m-d');
                 $banner->start_date = Jalalian::fromCarbon(Carbon::parse($banner->start_date))->format('Y-m-d');
             }
+
             return new JsonResponse($banners);
         }
-        return new JsonResponse(["message" => "There is no banner"]);
 
+        return new JsonResponse(['message' => 'There is no banner']);
     }
 
     public function index_back_office()
@@ -47,27 +47,29 @@ class BannerController extends Controller
         if (count($banners) != 0) {
             foreach ($banners as $banner) {
                 if (Carbon::now()->toDateString() > $banner->expire_date) {
-                    $banner["isExpire"] = true;
+                    $banner['isExpire'] = true;
                 } else {
-                    $banner["isExpire"] = false;
+                    $banner['isExpire'] = false;
                 }
                 if (Carbon::now()->toDateString() > $banner->start_date) {
-                    $banner["isStart"] = true;
+                    $banner['isStart'] = true;
                 } else {
-                    $banner["isStart"] = false;
+                    $banner['isStart'] = false;
                 }
                 if ($banner->hasButton) {
-                    $banner["hasButton"] = true;
+                    $banner['hasButton'] = 1;
                 } else {
-                    $banner["hasButton"] = false;
+                    $banner['hasButton'] = 0;
                 }
-                $banner->expire_date = Jalalian::fromCarbon(Carbon::parse($banner->expire_date))->format('Y-m-d');
-                $banner->start_date = Jalalian::fromCarbon(Carbon::parse($banner->start_date))->format('Y-m-d');
+
+                $banner->expire_date = Jalalian::forge(Carbon::parse($banner->expire_date))->format('Y-m-d');
+                $banner->start_date = Jalalian::forge(Carbon::parse($banner->start_date))->format('Y-m-d');
             }
+
             return new JsonResponse($banners);
         }
-        return new JsonResponse(["message" => "There is no banner"]);
 
+        return new JsonResponse(['message' => 'There is no banner']);
     }
 
     /**
@@ -77,17 +79,24 @@ class BannerController extends Controller
      */
     public function create(Request $request)
     {
-        $request["start_date"] = Jalalian::fromFormat('Y-m-d', $request["start_date"])->toCarbon();
-        $request["expire_date"] = Jalalian::fromFormat('Y-m-d', $request["expire_date"])->toCarbon();
-        $banner = Banner::query()->create([
-            "title" => $request["title"],
-            "description" => $request["description"],
-            "link" => $request["link"],
-            "start_date" => $request["start_date"],
-            "expire_date" => $request["expire_date"],
-            "hasButton" => $request["hasButton"]
+        $request->validate([
+            'title' => 'required',
+            'link' => 'required',
+            'start_date' => 'required',
+            'expire_date' => 'required',
         ]);
-        return new JsonResponse(["banner_id" => $banner->id]);
+        $request['start_date'] = Jalalian::fromFormat('Y-m-d', $request['start_date'])->toCarbon();
+        $request['expire_date'] = Jalalian::fromFormat('Y-m-d', $request['expire_date'])->toCarbon();
+        $banner = Banner::query()->create([
+            'title' => $request['title'],
+            'description' => $request['description'],
+            'link' => $request['link'],
+            'start_date' => $request['start_date'],
+            'expire_date' => $request['expire_date'],
+            'hasButton' => $request['hasButton']
+        ]);
+
+        return new JsonResponse(['banner_id' => $banner->id]);
     }
 
     /**
@@ -106,15 +115,14 @@ class BannerController extends Controller
             $filename = $id . '.' . $request->image_file->getClientOriginalExtension();
 
             $path = $file->storeAs('public/banners', $filename);
-            Banner::query()->where("id", "=", $id)->update([
-                "image_file" => url('storage/banners/' . $filename)
+            Banner::query()->where('id', '=', $id)->update([
+                'image_file' => url('storage/banners/' . $filename)
             ]);
 
-            return new JsonResponse(["image_file" => url('storage/banners/' . $filename)]);
-
-
+            return new JsonResponse(['image_file' => url('storage/banners/' . $filename)]);
         }
-        return new JsonResponse(["message" => "something error "], Response::HTTP_BAD_REQUEST);
+
+        return new JsonResponse(['message' => 'something error '], Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -125,8 +133,9 @@ class BannerController extends Controller
      */
     public function click_banner(Request $request)
     {
-        Banner::query()->where("id" , "=" , $request["id"])->increment('click_count');
-        return new JsonResponse(["message" => "plus count"]);
+        Banner::query()->where('id', '=', $request['id'])->increment('click_count');
+
+        return new JsonResponse(['message' => 'plus count']);
     }
 
     /**
@@ -149,7 +158,23 @@ class BannerController extends Controller
      */
     public function update(Request $request, Banner $banner)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'start_date' => 'required',
+            'expire_date' => 'required',
+        ]);
+        $banner->title = $request['title'];
+        $banner->description = $request['description'];
+        $banner->link = $request['link'];
+        $banner->hasButton = $request['hasButton'];
+
+        $banner->expire_date = Jalalian::fromFormat('Y-m-d', $request->expire_date)->toCarbon();
+        $banner->start_date = Jalalian::fromFormat('Y-m-d', $request->start_date)->toCarbon();
+        $banner->save();
+
+        return response()->json([
+            $banner
+        ]);
     }
 
     /**

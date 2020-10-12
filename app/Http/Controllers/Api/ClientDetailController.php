@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\ClientDetail;
+use App\Filters\ClientFilter;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
+use App\Http\Resources\ClientDetailIndexAdminAreaResources;
+use App\User;
+use App\WorkGroup;
 use Illuminate\Http\Request;
 use Morilog\Jalali\Jalalian;
 
@@ -31,33 +34,78 @@ class ClientDetailController extends Controller
         $clientDetail->company_name = $request->company_name;
         $clientDetail->save();
     }
-    public function index(Request $request){
-        $result=[];
-        $user_details = ClientDetail::all();
-        foreach ($user_details as $user_detail) {
-            $temp["client_code"] = $user_detail->user->id;
-            $temp["client_name"] = $user_detail->user->name;
-            $temp["company_name"] = $user_detail->company_name;
-            $temp["mobile"] = $user_detail->user->mobile;
-            $temp["register_date"] = Jalalian::fromCarbon($user_detail->user->created_at)->format('Y-m-d');
-            $temp["user_type"] = $user_detail->type;
-            $temp["tel"] = $user_detail->phone;
-            array_push($result, $temp);
+
+    public function index(Request $request, ClientFilter $filters)
+    {
+        $result = [];
+        if ($request->searchTerm == null) {
+            $user_details = User::whereNotNull('client_detail_id')->get();
+        } else {
+            $user_details = User::filter($filters)->whereNotNull('client_detail_id')->get();
         }
+
+        return ClientDetailIndexAdminAreaResources::collection($user_details);
+    }
+
+    public function show(Request $request, ClientDetail $clientDetail)
+    {
+        $result['client_code'] = $clientDetail->id;
+        $result['client_name'] = $clientDetail->user->name;
+        $result['status'] = (string) $clientDetail->user->status;
+        $result['company_name'] = $clientDetail->company_name;
+        $result['mobile'] = $clientDetail->user->mobile;
+        $result['register_date'] = Jalalian::fromCarbon($clientDetail->user->created_at)->format('Y-m-d');
+        $result['user_type'] = $clientDetail->type;
+        $result['tel'] = $clientDetail->phone;
+        $result['work_groups'] = $clientDetail->workGroups->where('parent_id', '!=', null)->pluck('id');
+
         return $result;
     }
-    public function show(Request $request){
 
-        $user_detail = ClientDetail::query()->where("id" , "=" , $request["id"])->first();
+    public function update(Request $request, ClientDetail $clientDetail)
+    {
+        return response()->json([
+            $request->all()
+        ]);
+        $detail = $clientDetail;
+        // update data here
+        $detail->status = $request->status;
 
-        $result["client_code"] = $user_detail->user->id;
-        $result["client_name"] = $user_detail->user->name;
-        $result["company_name"] = $user_detail->company_name;
-        $result["mobile"] = $user_detail->user->mobile;
-        $result["register_date"] =Jalalian::fromCarbon($user_detail->user->created_at)->format('Y-m-d');
-        $result["user_type"] = $user_detail->type;
-        $result["tel"] = $user_detail->phone;
+        // update work Groups here
 
-        return $result;
+        if (($detail->subscription_date == null || $detail->subscription_date == '')
+        && ($detail->subscription_count == 0) &&
+        ($detail->subscription_title == null || $detail->subscription_title == '')
+        ) {
+            abort(403, 'کاربر طرح اشتراکی ندارد');
+        }
+        if (request()->work_groups != null) {
+            if (count(request()->work_groups) > $detail->subscription_count) {
+                abort(403, 'تعداد گروه های کاری انتخاب شده بیشتر از تعداد مجاز است');
+                // } elseif (Jalalian::now()->format('Y-m-d') > $detail->subscription_date) {
+            //     abort(403, 'مدت زمان طرح اشتراکی شما به پایان رسیده است');
+            }
+        }
+        $newData = [];
+        foreach ($request['work_groups'] as $key => $value) {
+            array_push($newData, $value);
+        }
+        foreach ($request['work_groups'] as $key => $workGroupId) {
+            $workGroup = WorkGroup::where('id', $workGroupId)->first();
+            if ($workGroup->parent_id != null) {
+                array_push($newData, (int) $workGroup->parent_id);
+            }
+            if ($workGroup->parent_id == null && ($workGroup->children != null || $workGroup->children != [])) {
+                $childrenId = $workGroup->children->pluck('id');
+                if (!$this->isChildExistsInArray($childrenId, $request['work_groups']->toArray())) {
+                    unset($newData[array_search($workGroupId, $request['work_groups']->toArray())]);
+                }
+            }
+        }
+
+        $newData = array_unique($newData);
+        $detail->work_groups_changes++;
+        $detail->save();
+        $detail->workGroups()->sync($newData);
     }
 }

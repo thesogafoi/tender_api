@@ -72,7 +72,7 @@ class UserProfileController extends Controller
 
         $newData = array_unique($newData);
 
-        // $detail->work_groups_changes++;
+        $detail->work_groups_changes++;
         $detail->save();
         $detail->workGroups()->sync($newData);
     }

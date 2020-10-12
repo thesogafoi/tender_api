@@ -104,4 +104,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return 'CLIENT' == $this->type;
     }
+
+    public static function scopeFilter($query, $filters)
+    {
+        return $filters->apply($query);
+    }
 }

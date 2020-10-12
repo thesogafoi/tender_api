@@ -46,7 +46,7 @@ $factory->state(User::class, 'client', function (Faker $faker) {
         },
         'password' => Hash::make('021051'),
         'remember_token' => Str::random(10),
-        'type' => 'CLIENT'
+        'type' => 'CLIENT',
     ];
 });
 

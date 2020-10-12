@@ -88,17 +88,22 @@ Route::delete('subscription/{subscription}', 'Api\SubscriptionController@delete'
 
 Route::post('client-detail/create', 'Api\ClientDetailController@create');
 Route::get('client-detail/index', 'Api\ClientDetailController@index');
-Route::get('client-detail/show', 'Api\ClientDetailController@show');
+Route::get('client-detail/show/{clientDetail}', 'Api\ClientDetailController@show');
+
+Route::put('client-detail/update/{clientDetail}', 'Api\ClientDetailController@update');
 
 /*************************************************************************************************** */
 
 // Banner Controller
-Route::post('banner/create', 'Api\BannerController@create');
+
 Route::get('banner/index-app', 'Api\BannerController@index_app');
 Route::get('banner/index-back-office', 'Api\BannerController@index_back_office');
+
 Route::post('banner/click', 'Api\BannerController@click_banner');
+Route::post('banner/create', 'Api\BannerController@create');
 Route::post('banner/save/image/{id}', 'Api\BannerController@saveImage');
 
+Route::put('banner/update/{banner}', 'Api\BannerController@update');
 
 /*************************************************************************************************** */
 
@@ -108,6 +113,7 @@ Route::get('site/parent/workgroups', 'Api\Site\SiteController@getWorkGroupParent
 Route::get('site/child/workgroups/{workGroupId}', 'Api\Site\SiteController@getWorkGroupChild');
 Route::get('site/advertise/show/{advertise}', 'Api\Site\SiteController@show');
 Route::get('site/subscriptions', 'Api\Site\SiteController@showSubscriptions');
+Route::get('site/banner/index-app', 'Api\Site\SiteController@index_app');
 Route::get('site/user/related/advertises/{advertise}', 'Api\Site\SiteController@relatedAdvertises');
 
 Route::post('site/advertise/filter', 'Api\Site\SiteController@filter');

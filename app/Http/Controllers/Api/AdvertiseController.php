@@ -16,7 +16,7 @@ class AdvertiseController extends Controller
 {
     public function __construct()
     {
-         $this->middleware(['auth', 'superadmin']);
+        //  $this->middleware(['auth', 'superadmin']);
     }
 
     public function create(AdvertisesRequest $request)
