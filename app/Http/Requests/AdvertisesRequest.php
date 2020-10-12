@@ -61,20 +61,27 @@ class AdvertisesRequest extends FormRequest
             $advertise->status = $this->status == 1 ? 1 : 0;
             $advertise->save();
             $workGroupsRequest = [];
+
             $workGroupsRequest = $this->work_groups;
-            foreach ($workGroupsRequest as $id) {
-                $workGroup = WorkGroup::where('id', $id)->first();
-                if ($workGroup->parent_id != null) {
-                    array_push($workGroupsRequest, (int) $workGroup->parent_id);
+
+            if ($workGroupsRequest != null) {
+                foreach ($workGroupsRequest as $id) {
+                    $workGroup = WorkGroup::where('id', $id)->first();
+                    if ($workGroup->parent_id != null) {
+                        array_push($workGroupsRequest, (int) $workGroup->parent_id);
+                    }
                 }
+                $workGroupsRequest = array_unique($workGroupsRequest);
+                $advertise->workGroups()->sync($workGroupsRequest);
             }
-            $workGroupsRequest = array_unique($workGroupsRequest);
-            $advertise->workGroups()->sync($workGroupsRequest);
             $advertise->provinces()->sync($this->provinces);
 
-            $advertise->tender_code = $advertise->id . $advertise->created_at->format('m')
-            . $advertise->created_at->format('d');
+            $advertise->tender_code = $advertise->id . Jalalian::fromCarbon($advertise->created_at)->format('m')
+            . Jalalian::fromCarbon($advertise->created_at)->format('d');
             $advertise->save();
+            if ($advertise->tender_code == null || $advertise->tender_code == '') {
+                abort(500);
+            }
 
             return $advertise->id;
         } catch (\Exception $e) {
@@ -113,8 +120,7 @@ class AdvertisesRequest extends FormRequest
         $workGroupsRequest = array_unique($workGroupsRequest);
         $advertise->workGroups()->sync($workGroupsRequest);
         $advertise->provinces()->sync($this->provinces);
-        $advertise->tender_code = $advertise->id . $advertise->created_at->format('m')
-            . $advertise->created_at->format('d');
+
         $advertise->save();
 
         return $advertise->id;
