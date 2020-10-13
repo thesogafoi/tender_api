@@ -34,7 +34,7 @@ class ShowAdvertiseResource extends JsonResource
             'tender_code' => $this->tender_code,
             'title' => $this->title,
             'type' => $this->type,
-            'work_groups' => $this->workGroups->pluck('id'),
+            'work_groups' => $this->workGroups->where('parent_id', '!=', null)->pluck('id'),
             'provinces' => $this->provinces->pluck('id'),
         ];
     }
