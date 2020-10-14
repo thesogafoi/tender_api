@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Site Auth Controllr
+// Site Auth Controller
 
 Route::get('site/user', 'Api\Site\SiteAuthController@user');
 
@@ -17,6 +17,13 @@ Route::post('site/logout', 'Api\Site\SiteAuthController@logout');
 Route::get('user', 'Api\AuthController@user');
 Route::post('login', 'Api\AuthController@login');
 Route::post('logout', 'Api\AuthController@logout');
+
+/*************************************************************************************************** */
+
+/*************************************************************************************************** */
+
+// User Controller
+Route::post('user/create', 'Api\UserController@create');
 
 /*************************************************************************************************** */
 
@@ -84,11 +91,13 @@ Route::delete('subscription/{subscription}', 'Api\SubscriptionController@delete'
 
 /*************************************************************************************************** */
 
-// Client Dashboard Controller
+// Client Detail Controller
 
 Route::post('client-detail/create', 'Api\ClientDetailController@create');
 Route::get('client-detail/index', 'Api\ClientDetailController@index');
 Route::get('client-detail/show/{clientDetail}', 'Api\ClientDetailController@show');
+
+Route::post('admin/take/workgroups/for/{user}', 'Api\ClientDetailController@takeWorkGroups');
 
 Route::put('client-detail/update/{clientDetail}', 'Api\ClientDetailController@update');
 

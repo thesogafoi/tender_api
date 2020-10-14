@@ -15,6 +15,8 @@ use App\WorkGroup;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Morilog\Jalali\Jalalian;
 
 class SiteController extends Controller
@@ -105,18 +107,20 @@ class SiteController extends Controller
 
     public function relatedAdvertises(Advertise $advertise)
     {
-        if (auth()->user()->detail->workGroups != null && $advertise->workGroups != null) {
-            $relatedWorkGroups = $advertise->workGroups->pluck('id');
+        if (Gate::allows('client-can-see-advertise', $advertise)) {
+            if (auth()->user()->detail->workGroups != null && $advertise->workGroups != null) {
+                $relatedWorkGroups = $advertise->workGroups->pluck('id');
 
-            $advertises = Advertise::whereHas('workGroups', function ($model) use ($relatedWorkGroups) {
-                $model->where(function ($workGroup) use ($relatedWorkGroups) {
-                    $workGroup->whereIn('work_groups.id', $relatedWorkGroups);
+                $advertises = Advertise::whereHas('workGroups', function ($model) use ($relatedWorkGroups) {
+                    $model->where(function ($workGroup) use ($relatedWorkGroups) {
+                        $workGroup->whereIn('work_groups.id', $relatedWorkGroups);
+                    });
+                })->get()->take(10)->filter(function ($value) use ($advertise) {
+                    return $value->id != $advertise->id;
                 });
-            })->get()->take(10)->filter(function ($value) use ($advertise) {
-                return $value->id != $advertise->id;
-            });
 
-            return AdvertiseIndexResource::collection($advertises);
+                return AdvertiseIndexResource::collection($advertises);
+            }
         }
 
         return response()->json([

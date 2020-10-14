@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ClientDetailIndexAdminAreaResources;
 use App\User;
 use App\WorkGroup;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Morilog\Jalali\Jalalian;
 
@@ -58,34 +59,41 @@ class ClientDetailController extends Controller
         $result['user_type'] = $clientDetail->type;
         $result['tel'] = $clientDetail->phone;
         $result['work_groups'] = $clientDetail->workGroups->where('parent_id', '!=', null)->pluck('id');
+        $result['has_plne'] = false;
+        if ($clientDetail->subscription_date == null || $clientDetail->subscription_title == null) {
+            $result['has_plne'] = false;
+        } else {
+            if (Carbon::parse($clientDetail->subscription_date) > Carbon::now()) {
+                $result['has_plne'] = true;
+                $result['subscription_date'] = Jalalian::fromCarbon(Carbon::parse($clientDetail->subscription_date))->format('Y-m-d');
+                $result['subscription_title'] = $clientDetail->subscription_title;
+                $result['subscription_count'] = $clientDetail->subscription_count;
+                $result['work_groups_changes'] = $clientDetail->work_groups_changes;
+            }
+        }
 
         return $result;
     }
 
     public function update(Request $request, ClientDetail $clientDetail)
     {
-        return response()->json([
-            $request->all()
-        ]);
         $detail = $clientDetail;
-        // update data here
-        $detail->status = $request->status;
-
+        // update user data here
+        $detail->user->status = $request->status;
+        $detail->user->save();
         // update work Groups here
-
         if (($detail->subscription_date == null || $detail->subscription_date == '')
         && ($detail->subscription_count == 0) &&
         ($detail->subscription_title == null || $detail->subscription_title == '')
         ) {
             abort(403, 'کاربر طرح اشتراکی ندارد');
         }
-        if (request()->work_groups != null) {
-            if (count(request()->work_groups) > $detail->subscription_count) {
-                abort(403, 'تعداد گروه های کاری انتخاب شده بیشتر از تعداد مجاز است');
-                // } elseif (Jalalian::now()->format('Y-m-d') > $detail->subscription_date) {
-            //     abort(403, 'مدت زمان طرح اشتراکی شما به پایان رسیده است');
-            }
+        if ($request['work_groups'] == null) {
+            abort(403, 'گروه کاریی انتخاب نشده است');
+        } elseif ($request['work_groups'] == []) {
+            abort(403, 'گروه کاریی انتخاب نشده است');
         }
+
         $newData = [];
         foreach ($request['work_groups'] as $key => $value) {
             array_push($newData, $value);
@@ -102,7 +110,6 @@ class ClientDetailController extends Controller
                 }
             }
         }
-
         $newData = array_unique($newData);
         $detail->work_groups_changes++;
         $detail->save();

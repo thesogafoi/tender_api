@@ -139,8 +139,7 @@ class AdvertiseController extends Controller
 
         $advertisesId = $request->advertises_action;
 
-        try {
-            switch ($request->action) {
+        switch ($request->action) {
                 case 0:
                     foreach ($advertisesId as $advertiseId) {
                         $advertise = Advertise::where('id', $advertiseId)->first();
@@ -159,6 +158,9 @@ class AdvertiseController extends Controller
                 case 2:
                     foreach ($advertisesId as $advertiseId) {
                         $advertise = Advertise::where('id', $advertiseId)->first();
+                        if (count($advertise->workGroups->where('parent_id', '!=', null)) == 0) {
+                            abort(422, 'آکهی انتشار یافته نمیتواند فاقد دسته کاری باشد');
+                        }
                         $advertise->active();
                     }
                 break;
@@ -180,9 +182,5 @@ class AdvertiseController extends Controller
                     abort(500, 'لطفا دوباره تلاش کنید مشکلی برای سیستم بوجود آمده است');
                     break;
             }
-        } catch (\Exception $th) {
-            abort(500, $th);
-            abort(500, 'لطفا دوباره تلاش کنید مشکلی برای سیستم بوجود آمده است');
-        }
     }
 }

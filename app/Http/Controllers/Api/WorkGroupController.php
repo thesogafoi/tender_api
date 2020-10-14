@@ -85,7 +85,6 @@ class WorkGroupController extends Controller
             'type' => 'required',
             'priorty' => 'required'
         ]);
-
         $workGroup->title = $request->title;
         // if child
         if ($request->parent_id) {
@@ -93,7 +92,11 @@ class WorkGroupController extends Controller
         }
         // if parent
         if ($request->parent_id == null && $request->type != $workGroup->type && count($workGroup->children) != 0) {
-            abort(422, 'دسته ی کاری شامل زیر گروه است نمیتوانید نوع آن را تغییر دهید');
+            foreach ($workGroup->children as $child) {
+                if ($child->type != $request->type) {
+                    abort(422, 'دسته ی کاری شامل زیر گروه است نمیتوانید نوع آن را تغییر دهید ابتدا زیر نوع زیر گروه ها را تغییر دهید');
+                }
+            }
         }
         if ($request->status) {
             $workGroup->status = $request->status;

@@ -24,6 +24,12 @@ class AuthController extends Controller
         $credential = $request->only(['mobile', 'password']);
 
         if ($token = Auth::attempt($credential)) {
+            if (auth()->user()->isClient()) {
+                Auth::logout();
+
+                return abort(401);
+            }
+
             return (new UserRecourses(auth()->user()))->additional([
                 'token' => $token
             ]);

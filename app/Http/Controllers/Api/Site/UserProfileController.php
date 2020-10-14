@@ -50,9 +50,7 @@ class UserProfileController extends Controller
             //     abort(403, 'مدت زمان طرح اشتراکی شما به پایان رسیده است');
             }
         }
-        if ($detail->work_groups_changes >= 3) {
-            abort(403, 'شما بیشتر از ۳ بار گروه کاری خود را تغییر داده اید برای تغییرات بیشتر با پشتیبانی تماس حاصل کنید');
-        }
+
         $newData = [];
         foreach ($request['work_groups'] as $key => $value) {
             array_push($newData, $value);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SubscriptionResource;
 use App\Subscription;
 use Illuminate\Http\Request;
+use Morilog\Jalali\Jalalian;
 
 class SubscriptionController extends Controller
 {
@@ -21,7 +22,7 @@ class SubscriptionController extends Controller
         $subscription = new Subscription();
         $subscription->allowed_selection = $request->allowed_selection;
         $subscription->cost = $request->cost;
-        $subscription->period = $request->period;
+        $subscription->period = Jalalian::fromFormat('Y-m-d', $request->period)->toCarbon();
         $subscription->priorty = $request->priorty;
         if ($request->status) {
             $subscription->status = $request->status;

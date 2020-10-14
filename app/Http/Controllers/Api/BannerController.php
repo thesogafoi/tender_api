@@ -87,13 +87,14 @@ class BannerController extends Controller
         ]);
         $request['start_date'] = Jalalian::fromFormat('Y-m-d', $request['start_date'])->toCarbon();
         $request['expire_date'] = Jalalian::fromFormat('Y-m-d', $request['expire_date'])->toCarbon();
+
         $banner = Banner::query()->create([
             'title' => $request['title'],
             'description' => $request['description'],
             'link' => $request['link'],
             'start_date' => $request['start_date'],
             'expire_date' => $request['expire_date'],
-            'hasButton' => $request['hasButton']
+            'hasButton' => $request['hasButton'] == null ? 0 : $request['hasButton']
         ]);
 
         return new JsonResponse(['banner_id' => $banner->id]);

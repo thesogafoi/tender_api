@@ -17,5 +17,4 @@ class ClientDetailTest extends TestCase
         $this->assertEquals(ClientDetail::getValuesType('LEGAL'), 'حقوقی');
         $this->assertEquals(ClientDetail::getValuesType('COMPANY'), 'شرکتی');
     }
-
 }
