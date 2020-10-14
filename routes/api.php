@@ -107,6 +107,7 @@ Route::put('client-detail/update/{clientDetail}', 'Api\ClientDetailController@up
 
 Route::get('banner/index-app', 'Api\BannerController@index_app');
 Route::get('banner/index-back-office', 'Api\BannerController@index_back_office');
+Route::get('banner/{banner}', 'Api\BannerController@show');
 
 Route::post('banner/click', 'Api\BannerController@click_banner');
 Route::post('banner/create', 'Api\BannerController@create');

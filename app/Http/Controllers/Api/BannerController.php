@@ -113,7 +113,7 @@ class BannerController extends Controller
             $request->validate([
                 'image_file' => 'required|mimes:jpeg,jpg,png,gif'
             ]);
-            $filename = $id . '.' . $request->image_file->getClientOriginalExtension();
+            $filename = $id . '_banner_image.' . $request->image_file->getClientOriginalExtension();
 
             $path = $file->storeAs('public/banners', $filename);
             Banner::query()->where('id', '=', $id)->update([
@@ -187,5 +187,12 @@ class BannerController extends Controller
     public function destroy(Banner $banner)
     {
         //
+    }
+
+    public function show(Banner $banner)
+    {
+        return response()->json([
+            $banner
+        ]);
     }
 }
