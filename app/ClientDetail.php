@@ -28,9 +28,14 @@ class ClientDetail extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function payment()
+    public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function planes()
+    {
+        return $this->hasMany(ClientDetailPlane::class);
     }
 
     public function favorites()

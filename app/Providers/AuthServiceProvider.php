@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Advertise;
 use App\WorkGroup;
+use Carbon\Carbon;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -51,6 +52,18 @@ class AuthServiceProvider extends ServiceProvider
                 });
 
                 return $isExists;
+            }
+        });
+
+        Gate::define('has-plane', function ($user, $clientDetail) {
+            if ($clientDetail->subscription_date == null || $clientDetail->subscription_title == null) {
+                return false;
+            } else {
+                if (Carbon::parse($clientDetail->subscription_date) < Carbon::now()) {
+                    return false;
+                } else {
+                    return true;
+                }
             }
         });
         $this->registerPolicies();

@@ -26,4 +26,9 @@ class UserController extends Controller
         $user->status = $request->status;
         $user->save();
     }
+
+    public function index()
+    {
+        $users = User::where('client_detail_id', null)->get()->sortByDesc('id');
+    }
 }

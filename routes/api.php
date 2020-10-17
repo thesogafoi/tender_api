@@ -11,6 +11,7 @@ Route::post('site/register', 'Api\Site\SiteAuthController@register');
 Route::post('site/forget/password', 'Api\Site\SiteAuthController@forgetPassword');
 Route::post('site/login', 'Api\Site\SiteAuthController@login');
 Route::post('site/logout', 'Api\Site\SiteAuthController@logout');
+
 /*************************************************************************************************** */
 
 // Auth Controller
@@ -23,11 +24,14 @@ Route::post('logout', 'Api\AuthController@logout');
 /*************************************************************************************************** */
 
 // User Controller
+
 Route::post('user/create', 'Api\UserController@create');
+Route::get('user/index', 'Api\UserController@index');
 
 /*************************************************************************************************** */
 
 // AdInviter Controller
+
 Route::get('adinviter', 'Api\AdInviterController@index');
 
 Route::post('adinviter/create', 'Api\AdInviterController@create');
@@ -36,11 +40,14 @@ Route::post('adinviter/excel/create', 'Api\AdInviterController@createFromExcel')
 /*************************************************************************************************** */
 
 // WorkGroup Controller
+
 Route::get('workgroup/component/index', 'Api\WorkGroupController@index');
+Route::get('parent/workgroups/as/excel', 'Api\WorkGroupController@getParentAsExcel');
 Route::get('workgroups/as/excel', 'Api\WorkGroupController@getAsExcel');
 
 Route::post('workgroup/excel/create', 'Api\WorkGroupController@createFromExcel');
 Route::post('workgroup/create', 'Api\WorkGroupController@create');
+Route::post('workgroup/save/image/{id}', 'Api\WorkGroupController@saveImage');
 
 Route::put('workgroup/restore/{workGroupId}', 'Api\WorkGroupController@restore');
 Route::put('workgroup/{workGroup}', 'Api\WorkGroupController@update');
@@ -51,12 +58,14 @@ Route::delete('workgroup/delete/{workGroup}', 'Api\WorkGroupController@delete');
 /*************************************************************************************************** */
 
 // Privince Controller
+
 Route::post('province/create', 'Api\ProvinceController@create');
 Route::post('province/update/{province}', 'Api\ProvinceController@update');
 
 /*************************************************************************************************** */
 
 // Advertise Controller
+
 Route::get('advertise/show/{advertise}', 'Api\AdvertiseController@show');
 Route::get('advertise/search', 'Api\AdvertiseController@searchAdvertise');
 Route::get('advertise/filter', 'Api\AdvertiseController@filterAdvertise');
@@ -96,6 +105,7 @@ Route::delete('subscription/{subscription}', 'Api\SubscriptionController@delete'
 Route::post('client-detail/create', 'Api\ClientDetailController@create');
 Route::get('client-detail/index', 'Api\ClientDetailController@index');
 Route::get('client-detail/show/{clientDetail}', 'Api\ClientDetailController@show');
+Route::get('client-detail/planes/{clientDetail}', 'Api\ClientDetailController@clientPlanes');
 
 Route::post('admin/take/workgroups/for/{user}', 'Api\ClientDetailController@takeWorkGroups');
 
@@ -118,6 +128,7 @@ Route::put('banner/update/{banner}', 'Api\BannerController@update');
 /*************************************************************************************************** */
 
 // Site Controller
+
 Route::get('site/advertise', 'Api\Site\SiteController@getAdvertises');
 Route::get('site/parent/workgroups', 'Api\Site\SiteController@getWorkGroupParents');
 Route::get('site/child/workgroups/{workGroupId}', 'Api\Site\SiteController@getWorkGroupChild');
@@ -125,12 +136,14 @@ Route::get('site/advertise/show/{advertise}', 'Api\Site\SiteController@show');
 Route::get('site/subscriptions', 'Api\Site\SiteController@showSubscriptions');
 Route::get('site/banner/index-app', 'Api\Site\SiteController@index_app');
 Route::get('site/user/related/advertises/{advertise}', 'Api\Site\SiteController@relatedAdvertises');
+Route::get('site/workgroup/advertises/{workGroup}', 'Api\Site\SiteController@workGroupAdvertises');
 
 Route::post('site/advertise/filter', 'Api\Site\SiteController@filter');
 
 /*************************************************************************************************** */
 
 // User Profile Controller
+
 Route::get('site/user/workGroups', 'Api\Site\UserProfileController@userWorkGroups');
 Route::get('site/all/workGroups', 'Api\Site\UserProfileController@getAllWorkGroups');
 Route::get('site/user/parent/workgroups', 'Api\Site\UserProfileController@getWorkGroupParents');

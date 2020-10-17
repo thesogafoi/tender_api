@@ -40,6 +40,5 @@ class WorkGroup extends Model
 
     public function scopeFilterByArray($query, $array)
     {
-        
     }
 }

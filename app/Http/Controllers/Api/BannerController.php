@@ -22,11 +22,11 @@ class BannerController extends Controller
      *
      * @return JsonResponse
      */
-    public function index_app()
+    public function index_app(Request $request)
     {
         $banners = Banner::query()
             ->whereDate('start_date', '<=', Carbon::now()->toDateString())
-            ->whereDate('expire_date', '>', Carbon::now()->toDateString())->get();
+            ->whereDate('expire_date', '>', Carbon::now()->toDateString())->paginate(intval($request->items_per_page));
         if (count($banners) != 0) {
             foreach ($banners as $banner) {
                 $banner->expire_date = Jalalian::fromCarbon(Carbon::parse($banner->expire_date))->format('Y-m-d');
@@ -39,11 +39,9 @@ class BannerController extends Controller
         return new JsonResponse(['message' => 'There is no banner']);
     }
 
-    public function index_back_office()
+    public function index_back_office(Request $request)
     {
-//        return new JsonResponse(Carbon::now()->toDateString());
-        $banners = Banner::all();
-
+        $banners = Banner::latest()->paginate(intval($request->items_per_page));
         if (count($banners) != 0) {
             foreach ($banners as $banner) {
                 if (Carbon::now()->toDateString() > $banner->expire_date) {
@@ -191,6 +189,9 @@ class BannerController extends Controller
 
     public function show(Banner $banner)
     {
+        $banner->expire_date = Jalalian::forge(Carbon::parse($banner->expire_date))->format('Y-m-d');
+        $banner->start_date = Jalalian::forge(Carbon::parse($banner->start_date))->format('Y-m-d');
+
         return response()->json([
             $banner
         ]);

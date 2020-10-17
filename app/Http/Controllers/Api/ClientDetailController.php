@@ -9,7 +9,9 @@ use App\Http\Resources\ClientDetailIndexAdminAreaResources;
 use App\User;
 use App\WorkGroup;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Morilog\Jalali\Jalalian;
 
 class ClientDetailController extends Controller
@@ -40,9 +42,9 @@ class ClientDetailController extends Controller
     {
         $result = [];
         if ($request->searchTerm == null) {
-            $user_details = User::whereNotNull('client_detail_id')->get();
+            $user_details = User::whereNotNull('client_detail_id')->paginate(intval($request->items_per_page));
         } else {
-            $user_details = User::filter($filters)->whereNotNull('client_detail_id')->get();
+            $user_details = User::filter($filters)->whereNotNull('client_detail_id')->paginate(ClientDetail::latest()->first()->id);
         }
 
         return ClientDetailIndexAdminAreaResources::collection($user_details);
@@ -60,16 +62,15 @@ class ClientDetailController extends Controller
         $result['tel'] = $clientDetail->phone;
         $result['work_groups'] = $clientDetail->workGroups->where('parent_id', '!=', null)->pluck('id');
         $result['has_plne'] = false;
-        if ($clientDetail->subscription_date == null || $clientDetail->subscription_title == null) {
-            $result['has_plne'] = false;
+        $result['subscription_date'] = Jalalian::fromCarbon(Carbon::parse($clientDetail->subscription_date))->format('Y-m-d');
+        if (Gate::allows('has-plane', $clientDetail)) {
+            $result['has_plne'] = true;
+            $result['subscription_date'] = Jalalian::fromCarbon(Carbon::parse($clientDetail->subscription_date))->format('Y-m-d');
+            $result['subscription_title'] = $clientDetail->subscription_title;
+            $result['subscription_count'] = $clientDetail->subscription_count;
+            $result['work_groups_changes'] = $clientDetail->work_groups_changes;
         } else {
-            if (Carbon::parse($clientDetail->subscription_date) > Carbon::now()) {
-                $result['has_plne'] = true;
-                $result['subscription_date'] = Jalalian::fromCarbon(Carbon::parse($clientDetail->subscription_date))->format('Y-m-d');
-                $result['subscription_title'] = $clientDetail->subscription_title;
-                $result['subscription_count'] = $clientDetail->subscription_count;
-                $result['work_groups_changes'] = $clientDetail->work_groups_changes;
-            }
+            $result['has_plne'] = false;
         }
 
         return $result;
@@ -114,5 +115,21 @@ class ClientDetailController extends Controller
         $detail->work_groups_changes++;
         $detail->save();
         $detail->workGroups()->sync($newData);
+    }
+
+    public function clientPlanes(Request $request, ClientDetail $clientDetail)
+    {
+        if ($request->items_per_page != '-1') {
+            $planes = $clientDetail->planes()->latest()->paginate(intval($request->items_per_page));
+        } elseif ($request->items_per_page == '-1') {
+            $planes = $clientDetail->planes()->latest()->paginate($clientDetail->planes()->latest()->first()->id);
+        }
+        foreach ($planes as $plane) {
+            $plane->plane_submited = Jalalian::fromCarbon(Carbon::parse($plane->plane_submited))->format('Y-m-d');
+            $plane->plane_expired = Jalalian::fromCarbon(Carbon::parse($plane->plane_expired))->format('Y-m-d');
+            $plane['isExpire'] = Gate::allows('has-plane', $clientDetail);
+        }
+
+        return new JsonResponse($planes);
     }
 }

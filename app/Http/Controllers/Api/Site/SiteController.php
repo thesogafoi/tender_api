@@ -127,4 +127,15 @@ class SiteController extends Controller
             'data' => []
         ]);
     }
+
+    public function workGroupAdvertises(Request $request, WorkGroup $workGroup)
+    {
+        if ($request->items_per_page != '-1') {
+            $workGroupAdvertises = $workGroup->advertises()->latest()->paginate(intval($request->items_per_page));
+        } elseif ($request->items_per_page == '-1') {
+            $workGroupAdvertises = $workGroup->advertises()->latest()->paginate($workGroup->advertises()->latest()->first()->id);
+        }
+
+        return AdvertiseIndexResource::collection($workGroupAdvertises);
+    }
 }

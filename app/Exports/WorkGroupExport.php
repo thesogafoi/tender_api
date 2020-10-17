@@ -13,7 +13,7 @@ class WorkGroupExport implements FromCollection, WithHeadings
      */
     public function collection()
     {
-        return WorkGroup::where('parent_id', null)->get();
+        return WorkGroup::all();
     }
 
     public function headings(): array

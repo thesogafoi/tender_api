@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Site;
 
 use App\Advertise;
 use App\ClientDetail;
+use App\ClientDetailPlane;
 use App\Filters\AdvertiseFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdvertiseIndexResource;
@@ -31,6 +32,14 @@ class UserProfileController extends Controller
             $clientDetail->subscription_title = $subscription->title;
             $clientDetail->subscription_count = $subscription->allowed_selection;
             $clientDetail->save();
+
+            $plane = new ClientDetailPlane();
+            $plane->plane_title = $clientDetail->subscription_title;
+            $plane->plane_submited = Carbon::now();
+            $plane->plane_expired = Carbon::parse($subscription->period);
+            $plane->plane_cost = $subscription->cost;
+            $plane->client_detail_id = $clientDetail->id;
+            $plane->save();
         }
     }
 

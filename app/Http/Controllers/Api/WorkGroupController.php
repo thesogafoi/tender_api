@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\ParentWorkGroupExport;
 use App\Exports\WorkGroupExport;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Imports\WorkGroupImport;
 use App\WorkGroup;
+use Facade\FlareClient\Http\Response;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -33,9 +37,9 @@ class WorkGroupController extends Controller
         $workGroups->type = $request->type;
         $workGroups->save();
 
-        return [
-            'message' => 'گروه کاری با موفقیت اضافه شد'
-        ];
+        return response()->json([
+            $workGroups->id
+        ]);
     }
 
     public function createFromExcel(Request $request)
@@ -46,12 +50,22 @@ class WorkGroupController extends Controller
         Excel::import(new WorkGroupImport, $request->file('excel_file'));
     }
 
-    public function getAsExcel()
+    public function getParentAsExcel()
     {
-        Excel::store(new WorkGroupExport, 'public/excel/AsanTenderWorkGroups.xlsx', 'local');
+        Excel::store(new ParentWorkGroupExport, 'public/excel/AsanTenderWorkGroups.xlsx', 'local');
         if (Storage::exists('public/excel/AsanTenderWorkGroups.xlsx')) {
             return response()->json([
                 'url' => asset('storage/excel/AsanTenderWorkGroups.xlsx')
+            ]);
+        }
+    }
+
+    public function getAsExcel()
+    {
+        Excel::store(new WorkGroupExport, 'public/excel/AsanTenderWorkGroupsWithChild.xlsx', 'local');
+        if (Storage::exists('public/excel/AsanTenderWorkGroupsWithChild.xlsx')) {
+            return response()->json([
+                'url' => asset('storage/excel/AsanTenderWorkGroupsWithChild.xlsx')
             ]);
         }
     }
@@ -110,7 +124,7 @@ class WorkGroupController extends Controller
 
     public function delete(WorkGroup $workGroup)
     {
-        if ($workGroup->parent_id == null && ($workGroup->children != null || $workGroup->children != [])) {
+        if ($workGroup->parent_id == null && (count($workGroup->children) != 0)) {
             abort(422, 'دسته ی کاری مورد نظر شامل زیر گروه است نمیتوانید آنرا حذف کنید');
         }
         if ($workGroup->parent_id != null && (count($workGroup->advertises) > 0)) {
@@ -129,5 +143,24 @@ class WorkGroupController extends Controller
     {
         WorkGroup::withTrashed()
         ->where('id', $workGroupId)->forceDelete();
+    }
+
+    public function saveImage(Request $request, $id)
+    {
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $request->validate([
+                'image' => 'required|mimes:jpeg,jpg,png,gif'
+            ]);
+            $filename = $id . '.' . $request->image->getClientOriginalExtension();
+            $path = $file->storeAs('public/workgroups', $filename);
+            WorkGroup::query()->where('id', '=', $id)->update([
+                'image' => url('storage/workgroups/' . $filename)
+            ]);
+
+            return new JsonResponse(['image' => url('storage/workgroups/' . $filename)]);
+        }
+
+        return new JsonResponse(['message' => 'something error'], HttpResponse::HTTP_BAD_REQUEST);
     }
 }
