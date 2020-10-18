@@ -24,9 +24,13 @@ Route::post('logout', 'Api\AuthController@logout');
 /*************************************************************************************************** */
 
 // User Controller
+Route::get('user/index', 'Api\UserController@index');
 
 Route::post('user/create', 'Api\UserController@create');
-Route::get('user/index', 'Api\UserController@index');
+
+Route::put('user/update/{user}', 'Api\UserController@update');
+
+Route::delete('user/delete/{user}', 'Api\UserController@delete');
 
 /*************************************************************************************************** */
 

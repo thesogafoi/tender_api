@@ -32,6 +32,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         // Create a gate that user can see advertise or not
         Gate::define('client-can-see-advertise', function ($user, $advertise) {
+            if (Carbon::now()->greaterThanOrEqualTo(Carbon::parse($advertise->free_date))) {
+                return true;
+            }
             if (auth()->user() == null) {
                 return false;
             }
@@ -55,17 +58,58 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
-        Gate::define('has-plane', function ($user, $clientDetail) {
-            if ($clientDetail->subscription_date == null || $clientDetail->subscription_title == null) {
+        Gate::define('has-plane', function ($user) {
+            if ($user->detail == null) {
                 return false;
             } else {
-                if (Carbon::parse($clientDetail->subscription_date) < Carbon::now()) {
+                $clientDetail = $user->detail;
+                if ($clientDetail->subscription_date == null || $clientDetail->subscription_title == null) {
                     return false;
                 } else {
-                    return true;
+                    if (Carbon::parse($clientDetail->subscription_date) < Carbon::now()) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             }
         });
+
+        Gate::define('not-choosed-work-groups', function ($user) {
+            if ($user->detail == null) {
+                return false;
+            } else {
+                $clientDetail = $user->detail;
+                if (count($clientDetail->workGroups->where('parent_id', '!=', null)) == 0 && Gate::allows('has-plane')) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+
+        Gate::define('in-work-groups', function ($user, $advertise) {
+            if ($user->detail == null) {
+                return false;
+            } else {
+                $clientDetail = $user->detail;
+                $clientWorkGroups = $clientDetail->workGroups->where('parent_id', '!=', null);
+                if (count($clientWorkGroups) != 0 && Gate::allows('has-plane')) {
+                    $clientWorkGroupsId = $clientWorkGroups->pluck('id');
+                    $advertiseWorkGroupsId = $advertise->workGroups->pluck('id')->toArray();
+                    foreach ($clientWorkGroupsId as $clientWorkGroupId) {
+                        if (in_array($clientWorkGroupId, $advertiseWorkGroupsId)) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+        });
+
         $this->registerPolicies();
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Morilog\Jalali\Jalalian;
@@ -24,7 +23,11 @@ class AdvertiseIndexResource extends JsonResource
             'created_at' => Jalalian::forge($this->created_at)->format('Y-m-d'),
             'title' => $this->title,
             'type' => $this->type,
-            'can_client_see_advertise' => Carbon::now()->greaterThanOrEqualTo(Carbon::parse($this->free_date)) ? true : Gate::allows('client-can-see-advertise', $this)
+            'can_client_see_advertise' => Gate::allows('client-can-see-advertise', $this),
+
+            'has_plane' => Gate::allows('has-plane'),
+            'not_choosed_work_groups' => Gate::allows('not-choosed-work-groups'),
+            'in_work_groups' => Gate::allows('in-work-groups', $this),
         ];
     }
 }

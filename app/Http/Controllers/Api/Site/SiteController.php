@@ -131,7 +131,7 @@ class SiteController extends Controller
     public function workGroupAdvertises(Request $request, WorkGroup $workGroup)
     {
         if ($request->items_per_page != '-1') {
-            $workGroupAdvertises = $workGroup->advertises()->latest()->paginate(intval($request->items_per_page));
+            $workGroupAdvertises = $workGroup->advertises()->latest()->paginate(intval(10));
         } elseif ($request->items_per_page == '-1') {
             $workGroupAdvertises = $workGroup->advertises()->latest()->paginate($workGroup->advertises()->latest()->first()->id);
         }
