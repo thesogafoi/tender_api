@@ -63,7 +63,7 @@ class ClientDetailController extends Controller
         $result['work_groups'] = $clientDetail->workGroups->where('parent_id', '!=', null)->pluck('id');
         $result['has_plne'] = false;
         $result['subscription_date'] = Jalalian::fromCarbon(Carbon::parse($clientDetail->subscription_date))->format('Y-m-d');
-        if (Gate::allows('has-plane', $clientDetail)) {
+        if (Gate::allows('has-plane-in-admin', $clientDetail)) {
             $result['has_plne'] = true;
             $result['subscription_date'] = Jalalian::fromCarbon(Carbon::parse($clientDetail->subscription_date))->format('Y-m-d');
             $result['subscription_title'] = $clientDetail->subscription_title;
@@ -127,7 +127,7 @@ class ClientDetailController extends Controller
         foreach ($planes as $plane) {
             $plane->plane_submited = Jalalian::fromCarbon(Carbon::parse($plane->plane_submited))->format('Y-m-d');
             $plane->plane_expired = Jalalian::fromCarbon(Carbon::parse($plane->plane_expired))->format('Y-m-d');
-            $plane['isExpire'] = Gate::allows('has-plane', $clientDetail);
+            $plane['isExpire'] = Gate::allows('has-plane-in-admin', $clientDetail);
         }
 
         return new JsonResponse($planes);

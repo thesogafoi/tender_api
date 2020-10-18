@@ -75,6 +75,22 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
+        Gate::define('has-plane-in-admin', function ($user, $clientDetail) {
+            if ($clientDetail == null) {
+                return false;
+            } else {
+                if ($clientDetail->subscription_date == null || $clientDetail->subscription_title == null) {
+                    return false;
+                } else {
+                    if (Carbon::parse($clientDetail->subscription_date) < Carbon::now()) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            }
+        });
+
         Gate::define('not-choosed-work-groups', function ($user) {
             if ($user->detail == null) {
                 return false;
