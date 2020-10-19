@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 class SiteUserResource extends JsonResource
 {
@@ -21,6 +22,7 @@ class SiteUserResource extends JsonResource
             'phone' => $this->detail->phone,
             'type' => $this->detail->type,
             'company_name' => $this->detail->company_name,
+            'has_plane' => Gate::allows('has-plane', auth()->user()),
             'subscription_date' => $this->detail->subscription_date,
             'subscription_title' => $this->detail->subscription_title,
             'subscription_count' => $this->detail->subscription_count,

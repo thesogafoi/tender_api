@@ -32,7 +32,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         // Create a gate that user can see advertise or not
         Gate::define('client-can-see-advertise', function ($user, $advertise) {
-            if (Carbon::now()->gte(Carbon::parse($this->free_date))) {
+            if (Carbon::now()->gte(Carbon::parse($advertise->free_date))) {
                 return true;
             }
             if (auth()->user() == null) {
@@ -66,7 +66,7 @@ class AuthServiceProvider extends ServiceProvider
                 if ($clientDetail->subscription_date == null || $clientDetail->subscription_title == null) {
                     return false;
                 } else {
-                    if (Carbon::parse($clientDetail->subscription_date) < Carbon::now()) {
+                    if (Carbon::parse($clientDetail->subscription_date) <= Carbon::now()) {
                         return false;
                     } else {
                         return true;
