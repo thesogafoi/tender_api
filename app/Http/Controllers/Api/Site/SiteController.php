@@ -10,13 +10,18 @@ use App\Http\Resources\AdvertiseIndexResource;
 use App\Http\Resources\GetParentWorkGroupsResource;
 use App\Http\Resources\ShowAdvertiseResourceInSite;
 use App\Http\Resources\SubscriptionResource;
+use App\Http\Resources\UserRecourses;
 use App\Subscription;
+use App\User;
 use App\WorkGroup;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Morilog\Jalali\Jalalian;
 
 class SiteController extends Controller
@@ -137,5 +142,77 @@ class SiteController extends Controller
         }
 
         return AdvertiseIndexResource::collection($workGroupAdvertises);
+    }
+
+    // Forget Password
+
+    public function checkMobile(Request $request)
+    {
+        // check if mobile request exists
+        $request->validate([
+            'mobile' => 'required'
+        ]);
+        // check if user exists with this mobile
+        $user = User::where('mobile', $request->mobile)->first();
+        if ($user == null) {
+            abort(401);
+        }
+        // check client detail exists
+        if ($user->detail == null) {
+            abort(401);
+        }
+        // if all validation done
+        //   we should generate a code
+        $randomNumber = rand(10000, 99999);
+        Cache::put(
+            'verify_code_' . $request->mobile, // key
+            $randomNumber, //value
+                    90//in second
+        );
+
+        // we should send a sms to this number
+        // return 200
+        $data = [
+            'receptor' => $request->mobile,
+            'message' => 'به آسان تندر خوش آمدید . رمز عبور شما ' . $randomNumber . ' میباشد ',
+        ];
+        $response = Http::post("https://api.kavenegar.com/v1/https:/api.kavenegar.com/v1/78466B41486D46737338324E53344B3334696974306B48794F7637747970323775325A45635561667A52453D/verify/lookup.json?receptor=$request->mobile&token=$randomNumber&template=asantender", $data);
+
+        return response()->json([
+            'data' => $response
+        ]);
+    }
+
+    public function checkCode(Request $request)
+    {
+        $request->validate([
+            'mobile' => 'required|exists:users|max:11',
+            'password' => 'required',
+        ]);
+
+        if (!Cache::has('verify_code_' . $request->mobile) || ($request->password != Cache::get('verify_code_' . $request->mobile))) {
+            abort(401, Cache::get('verify_code_' . $request->mobile));
+        }
+        $user = User::where('mobile', $request->mobile)->first();
+        if ($user == null) {
+            abort(401, 'incomed mobile not true');
+        }
+        if ($user->detail == null) {
+            abort(401, 'Client Detail not founded');
+        }
+        $user->password = Hash::make($request->password);
+        $user->save();
+        $credential = $request->only(['mobile', 'password']);
+        if ($token = Auth::attempt($credential)) {
+            if (auth()->user()->detail == null) {
+                abort(401);
+            }
+
+            return (new UserRecourses(auth()->user()))->additional([
+                'token' => $token
+            ]);
+        } else {
+            return abort(401);
+        }
     }
 }

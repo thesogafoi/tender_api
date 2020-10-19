@@ -24,7 +24,7 @@ class AdvertiseIndexResource extends JsonResource
             'created_at' => Jalalian::forge($this->created_at)->format('Y-m-d'),
             'title' => $this->title,
             'type' => $this->type,
-            'can_client_see_advertise' => (Carbon::now()->toString() >= Carbon::parse($this->free_date)->toString()) == true ? true : Gate::allows('client-can-see-advertise', $this),
+            'can_client_see_advertise' => Carbon::now()->gte(Carbon::parse($this->free_date)) ? true : Gate::allows('client-can-see-advertise', $this),
 
             'has_plane' => Gate::allows('has-plane'),
             'not_choosed_work_groups' => Gate::allows('not-choosed-work-groups'),

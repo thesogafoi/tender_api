@@ -144,6 +144,12 @@ Route::get('site/workgroup/advertises/{workGroup}', 'Api\Site\SiteController@wor
 
 Route::post('site/advertise/filter', 'Api\Site\SiteController@filter');
 
+// forget password
+// a link for is client exists
+Route::post('site/forget-password/mobile', 'Api\Site\SiteController@checkMobile');
+// a link for register password
+Route::post('site/forget-password/code', 'Api\Site\SiteController@checkCode');
+
 /*************************************************************************************************** */
 
 // User Profile Controller
