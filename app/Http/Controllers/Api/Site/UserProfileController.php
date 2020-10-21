@@ -15,7 +15,6 @@ use App\WorkGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Morilog\Jalali\Jalalian;
 
 class UserProfileController extends Controller
 {
@@ -26,9 +25,10 @@ class UserProfileController extends Controller
     public function takePlane(Subscription $subscription)
     {
         $user = auth()->user();
+
         $clientDetail = $user->detail;
         if ($subscription->cost == 0) {
-            $clientDetail->subscription_date = Carbon::parse($subscription->period);
+            $clientDetail->subscription_date = Carbon::now()->addDays(intval($subscription->period));
             $clientDetail->subscription_title = $subscription->title;
             $clientDetail->subscription_count = $subscription->allowed_selection;
             $clientDetail->save();
@@ -36,7 +36,7 @@ class UserProfileController extends Controller
             $plane = new ClientDetailPlane();
             $plane->plane_title = $clientDetail->subscription_title;
             $plane->plane_submited = Carbon::now();
-            $plane->plane_expired = Carbon::parse($subscription->period);
+            $plane->plane_expired = Carbon::now()->addDays(intval($subscription->period));
             $plane->plane_cost = $subscription->cost;
             $plane->client_detail_id = $clientDetail->id;
             $plane->save();
@@ -55,11 +55,8 @@ class UserProfileController extends Controller
         if (request()->work_groups != null) {
             if (count(request()->work_groups) > $detail->subscription_count) {
                 abort(403, 'تعداد گروه های کاری انتخاب شده بیشتر از تعداد مجاز است');
-                // } elseif (Jalalian::now()->format('Y-m-d') > $detail->subscription_date) {
-            //     abort(403, 'مدت زمان طرح اشتراکی شما به پایان رسیده است');
             }
         }
-
         $newData = [];
         foreach ($request['work_groups'] as $key => $value) {
             array_push($newData, $value);

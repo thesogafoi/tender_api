@@ -18,7 +18,7 @@ class CreateSubscriptionsTable extends Migration
             $table->unsignedInteger('allowed_selection');
             $table->string('cost', 11);
             $table->string('title');
-            $table->date('period', 11);
+            $table->string('period', 11);
             $table->unsignedInteger('priorty')->default(1);
             $table->unsignedTinyInteger('status')->default(0);
             $table->timestamps();

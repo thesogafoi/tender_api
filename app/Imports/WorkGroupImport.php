@@ -21,9 +21,17 @@ class WorkGroupImport implements ToCollection, WithHeadingRow
                     'type' => 'required'
                 ])->validate();
                 $this->extendValidation($row, $key);
+                $newKey = 1 + $key;
                 $workGroup = new WorkGroup();
                 $workGroup->title = $row['title'];
                 $workGroup->parent_id = $row['parent_id'];
+                $parentWorkGroup = WorkGroup::where('id', $row['parent_id'])->first();
+                if ($parentWorkGroup == null && $row['parent_id'] != null) {
+                    $error = \Illuminate\Validation\ValidationException::withMessages([
+                        "سرگروه انتخاب شده اشتباه است {$newKey}"
+                    ]);
+                    throw $error;
+                }
                 $workGroup->priorty = $row['priorty'];
                 $workGroup->type = $row['type'];
                 $workGroup->image = $row['image'];

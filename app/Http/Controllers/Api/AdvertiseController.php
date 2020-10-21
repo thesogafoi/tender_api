@@ -9,6 +9,7 @@ use App\Http\Requests\AdvertisesRequest;
 use App\Http\Resources\AdvertiseAdminResource;
 use App\Http\Resources\ShowAdvertiseResource;
 use App\Imports\AdvertiseImport;
+use App\WorkGroup;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -146,7 +147,20 @@ class AdvertiseController extends Controller
                         if ($request->work_groups_action == null) {
                             abort(422, 'لطفا دسته ی کاری مورد نظر را وارد کنید');
                         }
-                        $advertise->workGroups()->sync($request->work_groups_action);
+                        $workGroupsRequest = [];
+
+                        $workGroupsRequest = $request->work_groups_action;
+
+                        if ($workGroupsRequest != null) {
+                            foreach ($workGroupsRequest as $id) {
+                                $workGroup = WorkGroup::where('id', $id)->first();
+                                if ($workGroup->parent_id != null) {
+                                    array_push($workGroupsRequest, (int) $workGroup->parent_id);
+                                }
+                            }
+                            $workGroupsRequest = array_unique($workGroupsRequest);
+                            $advertise->workGroups()->sync($workGroupsRequest);
+                        }
                     }
                 break;
                 case 1:

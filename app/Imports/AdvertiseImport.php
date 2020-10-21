@@ -38,14 +38,14 @@ class AdvertiseImport implements ToCollection, WithHeadingRow
             $advertise->title = $row['title'];
             $advertise->resource = $row['resource'];
             $advertise->adinviter_title = $row['adinviter_title'];
+
             $advertise->type = $row['type'];
             $advertise->invitation_code = $row['invitation_code'];
-
-            $advertise->receipt_date = Jalalian::fromFormat('Y-m-d', $row['receipt_date'])->toCarbon() ?? null;
-            $advertise->invitation_date = Jalalian::fromFormat('Y-m-d', $row['invitation_date'])->toCarbon() ?? null;
-            $advertise->submit_date = Jalalian::fromFormat('Y-m-d', $row['submit_date'])->toCarbon() ?? null;
-            $advertise->start_date = Jalalian::fromFormat('Y-m-d', $row['start_date'])->toCarbon() ?? null;
-            $advertise->free_date = Jalalian::fromFormat('Y-m-d', $row['free_date'])->toCarbon() ?? null;
+            $advertise->receipt_date = $row['receipt_date'] != null ? Jalalian::fromFormat('Y-m-d', $row['receipt_date'])->toCarbon() : null;
+            $advertise->invitation_date = $row['invitation_date'] != null ? Jalalian::fromFormat('Y-m-d', $row['invitation_date'])->toCarbon() : null;
+            $advertise->submit_date = $row['submit_date'] != null ? Jalalian::fromFormat('Y-m-d', $row['submit_date'])->toCarbon() : null;
+            $advertise->start_date = $row['start_date'] != null ? Jalalian::fromFormat('Y-m-d', $row['start_date'])->toCarbon() : null;
+            $advertise->free_date = $row['free_date'] != null ? Jalalian::fromFormat('Y-m-d', $row['free_date'])->toCarbon() : null;
 
             $advertise->description = $row['description'];
             $advertise->is_nerve_center = $row['is_nerve_center'];
@@ -55,6 +55,7 @@ class AdvertiseImport implements ToCollection, WithHeadingRow
             $advertise->status = $row['status'] ?? 0;
 
             $advertise->adinviter_id = $row['adinviter_id'] ?? null;
+
             $advertise->save();
             foreach ($row['work_groups'] as $workGroupId) {
                 $newkey = $key + 1;

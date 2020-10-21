@@ -22,7 +22,7 @@ class CreateAdvertisesTable extends Migration
             $table->unsignedBigInteger('adinviter_id')->nullable();
             $table->string('adinviter_title')->nullable();
             $table->enum('type', Advertise::types())->default(Advertise::types()[0]);
-            $table->string('invitation_code')->nullable();
+            $table->string('invitation_code', 255)->nullable();
             $table->date('receipt_date')->nullable();
             $table->date('submit_date')->nullable();
             $table->date('start_date')->nullable();

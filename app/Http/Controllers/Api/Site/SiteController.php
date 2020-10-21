@@ -65,6 +65,18 @@ class SiteController extends Controller
 
             return AdvertiseIndexResource::collection($searchedData);
         }
+
+        if ($request->searchTerm == null && $request->searchType != null) {
+            if ($request->searchType == 0) {
+                $searchedData = Advertise::where('type', 'AUCTION')->where('status', 1)->paginate(10);
+            } else {
+                $searchedData = Advertise::where(function ($model) {
+                    $model->where('type', 'TENDER')->orWhere('type', 'INQUIRY');
+                })->where('status', 1)->paginate(10);
+            }
+
+            return AdvertiseIndexResource::collection($searchedData);
+        }
     }
 
     public function getWorkGroupChild($workGroupId)
