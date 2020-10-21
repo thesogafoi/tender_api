@@ -16,6 +16,7 @@ class workGroupIndexRecourse extends JsonResource
     {
         return [
             'parent_id' => $this->parent_id,
+            'id' => $this->id,
             'type' => $this->type,
             'title' => $this->title,
             'image' => $this->image,
