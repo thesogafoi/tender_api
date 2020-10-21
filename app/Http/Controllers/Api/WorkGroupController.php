@@ -6,6 +6,7 @@ use App\Exports\ParentWorkGroupExport;
 use App\Exports\WorkGroupExport;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\workGroupIndexRecourse;
 use App\Imports\WorkGroupImport;
 use App\WorkGroup;
 use Facade\FlareClient\Http\Response;
@@ -84,12 +85,9 @@ class WorkGroupController extends Controller
 
     public function index()
     {
-        $workGroups = WorkGroup::where('parent_id', null)->orderBy('priorty', 'asc')
-            ->with('children')->get()->sortBy('priorty');
+        $workGroups = WorkGroup::where('parent_id', null)->orderBy('priorty', 'asc')->get()->sortBy('priorty');
 
-        return response()->json(
-            $workGroups
-        );
+        return workGroupIndexRecourse::collection($workGroups);
     }
 
     public function update(WorkGroup $workGroup, Request $request)
