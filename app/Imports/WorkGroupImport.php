@@ -32,14 +32,14 @@ class WorkGroupImport implements ToCollection, WithHeadingRow
                     ]);
                     throw $error;
                 } else {
-                    if ($parentWorkGroup->type != $row['type']) {
+                    if ($parentWorkGroup != null && $parentWorkGroup->type != $row['type']) {
                         $error = \Illuminate\Validation\ValidationException::withMessages([
                             "نوع سرگروه و نوع دسته کاری با هم مطابقت ندارد . خط {$newKey} اکسل خود را مجددا بررسی کنید"
                         ]);
                         throw $error;
                     }
 
-                    if ($parentWorkGroup->parent_id != null) {
+                    if ($parentWorkGroup != null && $parentWorkGroup->parent_id != null) {
                         $error = \Illuminate\Validation\ValidationException::withMessages([
                             "سرگروه انتخاب شده قبلا در سیستم به عنوان زیرگروه ثبت شده است. خط {$newKey} اکسل خود را مجددا بررسی کنید "
                         ]);
