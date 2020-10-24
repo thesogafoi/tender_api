@@ -21,21 +21,34 @@ class WorkGroupImport implements ToCollection, WithHeadingRow
                     'type' => 'required'
                 ])->validate();
                 $this->extendValidation($row, $key);
-                $newKey = 1 + $key;
+                $newKey = 2 + $key;
                 $workGroup = new WorkGroup();
                 $workGroup->title = $row['title'];
                 $workGroup->parent_id = $row['parent_id'];
                 $parentWorkGroup = WorkGroup::where('id', $row['parent_id'])->first();
                 if ($parentWorkGroup == null && $row['parent_id'] != null) {
                     $error = \Illuminate\Validation\ValidationException::withMessages([
-                        "سرگروه انتخاب شده اشتباه است {$newKey}"
+                        "سرگروه انتخاب شده اشتباه است. خط {$newKey} اکسل خود را مجددا بررسی کنید "
                     ]);
                     throw $error;
+                } else {
+                    if ($parentWorkGroup->type != $row['type']) {
+                        $error = \Illuminate\Validation\ValidationException::withMessages([
+                            "نوع سرگروه و نوع دسته کاری با هم مطابقت ندارد . خط {$newKey} اکسل خود را مجددا بررسی کنید"
+                        ]);
+                        throw $error;
+                    }
+
+                    if ($parentWorkGroup->parent_id != null) {
+                        $error = \Illuminate\Validation\ValidationException::withMessages([
+                            "سرگروه انتخاب شده قبلا در سیستم به عنوان زیرگروه ثبت شده است. خط {$newKey} اکسل خود را مجددا بررسی کنید "
+                        ]);
+                        throw $error;
+                    }
                 }
                 $workGroup->priorty = $row['priorty'];
                 $workGroup->type = $row['type'];
                 $workGroup->image = $row['image'];
-
                 $workGroup->save();
             }
         }
@@ -43,11 +56,12 @@ class WorkGroupImport implements ToCollection, WithHeadingRow
 
     protected function extendValidation($row, $key)
     {
+        $newKey = $key + 2;
         $workgroups = WorkGroup::where('type', $row['type'])->
             where('title', $row['title'])->first();
         if ($workgroups != null) {
             $error = \Illuminate\Validation\ValidationException::withMessages([
-                "گروه کاری شماره {$key} دوبار وارد شده است"
+                "گروه کاری در خط {$newKey} قبلا در سیستم ثبت شده است."
             ]);
             throw $error;
         }

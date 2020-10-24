@@ -58,7 +58,7 @@ class AdvertiseImport implements ToCollection, WithHeadingRow
 
             $advertise->save();
             foreach ($row['work_groups'] as $workGroupId) {
-                $newkey = $key + 1;
+                $newkey = $key + 2;
                 $workgroup = WorkGroup::where('id', $workGroupId)->first();
                 if ($workgroup != null) {
                     if ($workgroup->type != $row['type']) {
