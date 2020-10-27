@@ -181,8 +181,11 @@ class AdvertiseController extends Controller
                 case 3:
                     foreach ($advertisesId as $advertiseId) {
                         $advertise = Advertise::where('id', $advertiseId)->first();
-                        if ($advertise->workGroups) {
+
+                        if ($advertise->workGroups && $advertise != null) {
                             $advertise->workGroups()->detach();
+                        } else {
+                            abort(422, 'آگهی های انتخاب شده اشتباه است دوباره تلاش کنید');
                         }
                         if ($advertise->image) {
                             if (file_exists($advertise->image)) {

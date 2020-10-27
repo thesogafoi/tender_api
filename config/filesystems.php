@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Filesystem Disk
@@ -42,6 +41,22 @@ return [
     */
 
     'disks' => [
+        'custom-ftp' => [
+            'driver' => 'ftp',
+
+            'host' => 'ftp.example.com',
+
+            'username' => 'myusername',
+
+            'password' => 'mypassword',
+
+            // Optional FTP Settings...
+            // 'port'     => 21,
+            // 'root' => '/Example',
+            // 'passive'  => true,
+            // 'ssl'      => true,
+            // 'timeout'  => 30,
+        ],
 
         'local' => [
             'driver' => 'local',
@@ -51,7 +66,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 
@@ -64,7 +79,6 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
         ],
-
     ],
 
     /*
@@ -82,5 +96,4 @@ return [
         public_path('storage') => storage_path('app/public'),
         public_path('banners') => storage_path('app/banners'),
     ],
-
 ];

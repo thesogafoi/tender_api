@@ -1,10 +1,7 @@
 <?php
 
-use App\Advertise;
 use App\Province;
-use App\Subscription;
 use App\User;
-use App\WorkGroup;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -18,29 +15,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // create multiple type of work_groups
-        // assign first half advertises to first half work_groups
-        // assign second half advertises to second half work_groups
-
-        // factory(Advertise::class, 10)->create();
-        // factory(WorkGroup::class, 10)->create();
-        // factory(Subscription::class, 5)->create();
-
-        // foreach (WorkGroup::all()->slice(1, 50) as $workgroup) {
-        //     $workgroup->parent_id = 1;
-        //     $workgroup->save();
-        // }
-        // $firstWorkGroups = WorkGroup::all()->slice(1, 5);
-        // $secondWorkGroups = WorkGroup::all()->slice(5, 10);
-        // $firstWorkGroupsId = $firstWorkGroups->pluck('id');
-        // $secondWorkGroupsId = $secondWorkGroups->pluck('id');
-        // foreach (Advertise::all()->slice(1, 5) as $advertise) {
-        //     $advertise->workGroups()->sync($firstWorkGroupsId);
-        // }
-        // foreach (Advertise::all()->slice(5, 10) as $advertise) {
-        //     $advertise->workGroups()->sync($secondWorkGroupsId);
-        // }
-
         $provinces = [
             'آذربایجان شرقی',
             'آذربایجان غربی',
