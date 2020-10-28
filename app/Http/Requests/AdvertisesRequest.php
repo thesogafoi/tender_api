@@ -27,7 +27,7 @@ class AdvertisesRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required',
+            'title' => 'required|max:1000',
             'invitation_date' => 'required',
             'description' => 'required',
             'is_nerve_center' => 'required',

@@ -22,14 +22,16 @@ class AdvertiseImport implements ToCollection, WithHeadingRow
         foreach ($rows as $key => $row) {
             $row['work_groups'] = explode(',', $row['work_groups']);
             $row['provinces'] = explode(',', $row['provinces']);
+
             $row['type'] = strtoupper($row['type']);
             $row['receipt_date'] = trim($row['receipt_date']);
             $row['invitation_date'] = trim($row['invitation_date']);
             $row['submit_date'] = trim($row['submit_date']);
             $row['start_date'] = trim($row['start_date']);
             $row['free_date'] = trim($row['free_date']);
+
             Validator::make($row->toArray(), [
-                'title' => 'required',
+                'title' => 'required|max:1000',
                 'invitation_date' => 'required|date_format:Y-m-d',
                 'receipt_date' => 'date_format:Y-m-d',
                 'submit_date' => 'date_format:Y-m-d',

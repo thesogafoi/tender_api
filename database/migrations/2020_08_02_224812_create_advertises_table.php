@@ -17,7 +17,7 @@ class CreateAdvertisesTable extends Migration
         Schema::create('advertises', function (Blueprint $table) {
             $table->id();
             $table->string('tender_code', 255)->nullable();
-            $table->string('title');
+            $table->string('title', '1000');
             $table->unsignedTinyInteger('status')->default(0);
             $table->unsignedBigInteger('adinviter_id')->nullable();
             $table->string('adinviter_title')->nullable();
