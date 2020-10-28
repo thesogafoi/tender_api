@@ -57,7 +57,7 @@ class AdvertiseController extends Controller
     public function createFromExcel(Request $request)
     {
         $request->validate([
-            'excel_file' => 'required|mimes:xls,xlm,xla,xlc,xlt,xlw,xlsx'
+            'excel_file' => 'required'
         ]);
         Excel::import(new AdvertiseImport, $request->file('excel_file'));
     }

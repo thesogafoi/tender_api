@@ -22,7 +22,7 @@ class AdvertiseImport implements ToCollection, WithHeadingRow
         foreach ($rows as $key => $row) {
             $row['work_groups'] = explode(',', $row['work_groups']);
             $row['provinces'] = explode(',', $row['provinces']);
-
+            $row['type'] = strtoupper($row['type']);
             $row['receipt_date'] = trim($row['receipt_date']);
             $row['invitation_date'] = trim($row['invitation_date']);
             $row['submit_date'] = trim($row['submit_date']);
@@ -33,7 +33,7 @@ class AdvertiseImport implements ToCollection, WithHeadingRow
                 'invitation_date' => 'required|date_format:Y-m-d',
                 'receipt_date' => 'date_format:Y-m-d',
                 'submit_date' => 'date_format:Y-m-d',
-                // 'start_date' => 'date_format:Y-m-d',
+                'start_date' => 'date_format:Y-m-d',
                 'free_date' => 'date_format:Y-m-d',
                 'description' => 'required',
                 'is_nerve_center' => 'required',
