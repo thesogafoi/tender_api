@@ -18,6 +18,7 @@ class GetParentWorkGroupsResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'type' => $this->type,
+            'image' => $this->image,
         ];
     }
 }

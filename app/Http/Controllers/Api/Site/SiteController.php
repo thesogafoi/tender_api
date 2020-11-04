@@ -39,7 +39,7 @@ class SiteController extends Controller
 
     public function filter(Request $request, AdvertiseFilter $filters)
     {
-        $searchedData = Advertise::filter($filters)->where('status', 1)->paginate(10);
+        $searchedData = Advertise::filter($filters)->where('status', 1)->orderBy('id', 'desc')->paginate(10);
 
         return AdvertiseIndexResource::collection($searchedData);
     }
@@ -51,15 +51,18 @@ class SiteController extends Controller
             ->get());
         }
         if ($request->searchTerm != null) {
+            request()->searchTerm = str_replace(' ', '%', request()->searchTerm);
             if ($request->searchType == null) {
-                $searchedData = Advertise::filter($filters)->where('status', 1)->paginate(10);
+                $searchedData = Advertise::filter($filters)->where('status', 1)->orderBy('id', 'desc')->paginate(10);
             } else {
                 if ($request->searchType == 0) {
-                    $searchedData = Advertise::filter($filters)->where('type', 'AUCTION')->where('status', 1)->paginate(10);
+                    $searchedData = Advertise::filter($filters)->where('type', 'AUCTION')->where('status', 1)
+                    ->orderBy('id', 'desc')->paginate(10);
                 } else {
                     $searchedData = Advertise::filter($filters)->where(function ($model) {
                         $model->where('type', 'TENDER')->orWhere('type', 'INQUIRY');
-                    })->where('status', 1)->paginate(10);
+                    })->where('status', 1)
+                    ->orderBy('id', 'desc')->paginate(10);
                 }
             }
 
@@ -68,11 +71,13 @@ class SiteController extends Controller
 
         if ($request->searchTerm == null && $request->searchType != null) {
             if ($request->searchType == 0) {
-                $searchedData = Advertise::where('type', 'AUCTION')->where('status', 1)->paginate(10);
+                $searchedData = Advertise::where('type', 'AUCTION')->where('status', 1)
+                ->orderBy('id', 'desc')->paginate(10);
             } else {
                 $searchedData = Advertise::where(function ($model) {
                     $model->where('type', 'TENDER')->orWhere('type', 'INQUIRY');
-                })->where('status', 1)->paginate(10);
+                })->where('status', 1)
+                ->orderBy('id', 'desc')->paginate(10);
             }
 
             return AdvertiseIndexResource::collection($searchedData);

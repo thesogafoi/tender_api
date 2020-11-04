@@ -19,6 +19,8 @@ class AdvertiseFilter extends Filter
 
     public function description()
     {
+        $this->request->description = str_replace(' ', '%', $this->request->description);
+
         return $this->builder->where('description', 'LIKE', '%' . $this->request->description . '%');
     }
 
@@ -54,6 +56,8 @@ class AdvertiseFilter extends Filter
 
     public function title()
     {
+        $this->request->title = str_replace(' ', '%', $this->request->title);
+
         return $this->builder->where('title', 'LIKE', '%' . $this->request->title . '%');
     }
 
@@ -69,11 +73,15 @@ class AdvertiseFilter extends Filter
 
     public function resource()
     {
+        $this->request->resource = str_replace(' ', '%', $this->request->resource);
+
         return $this->builder->where('resource', 'LIKE', '%' . $this->request->resource . '%');
     }
 
     public function adinviter_title()
     {
+        $this->request->adinviter_title = str_replace(' ', '%', $this->request->adinviter_title);
+
         return $this->builder->where('adinviter_title', 'LIKE', '%' . $this->request->adinviter_title . '%');
     }
 
@@ -212,6 +220,8 @@ class AdvertiseFilter extends Filter
 
     public function searchTerm()
     {
+        $this->request->searchTerm = str_replace(' ', '%', $this->request->searchTerm);
+
         return $this->builder->where('invitation_code', 'LIKE', $this->request->searchTerm)
         ->orWhere('tender_code', '=', $this->request->searchTerm)
         ->orWhere('title', 'LIKE', '%' . $this->request->searchTerm . '%')
