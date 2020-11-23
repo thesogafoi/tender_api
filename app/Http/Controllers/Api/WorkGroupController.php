@@ -12,6 +12,7 @@ use App\WorkGroup;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -106,7 +107,7 @@ class WorkGroupController extends Controller
         if ($request->parent_id == null && $request->type != $workGroup->type && count($workGroup->children) != 0) {
             foreach ($workGroup->children as $child) {
                 if ($child->type != $request->type) {
-                    abort(422, 'دسته ی کاری شامل زیر گروه است نمیتوانید نوع آن را تغییر دهید ابتدا زیر نوع زیر گروه ها را تغییر دهید');
+                    abort(422, Lang::get('messages.cannot_change_parent_wg'));
                 }
             }
         }
@@ -123,10 +124,10 @@ class WorkGroupController extends Controller
     public function delete(WorkGroup $workGroup)
     {
         if ($workGroup->parent_id == null && (count($workGroup->children) != 0)) {
-            abort(422, 'دسته ی کاری مورد نظر شامل زیر گروه است نمیتوانید آنرا حذف کنید');
+            abort(422, Lang::get('messages.cannot_delete_paret_wg_cause_of_child'));
         }
         if ($workGroup->parent_id != null && (count($workGroup->advertises) > 0)) {
-            abort(422, 'دسته ی کاری مورد نظر به آگهی تخصیص داده شده است نمیتوانید آن را حذف کنید');
+            abort(422, Lang::get('messages.cannot_delete_paret_wg_cause_of_advertise'));
         }
         $workGroup->destroy($workGroup->id);
     }

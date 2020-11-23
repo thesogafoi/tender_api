@@ -208,7 +208,7 @@ class SiteController extends Controller
         ]);
 
         if (!Cache::has('verify_code_' . $request->mobile) || ($request->password != Cache::get('verify_code_' . $request->mobile))) {
-            abort(401, Cache::get('verify_code_' . $request->mobile));
+            abort(401, 'Not Founded');
         }
         $user = User::where('mobile', $request->mobile)->first();
         if ($user == null) {

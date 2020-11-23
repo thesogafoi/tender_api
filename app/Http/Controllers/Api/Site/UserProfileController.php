@@ -15,6 +15,7 @@ use App\WorkGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Lang;
 
 class UserProfileController extends Controller
 {
@@ -50,11 +51,11 @@ class UserProfileController extends Controller
         && ($detail->subscription_count == 0) &&
         ($detail->subscription_title == null || $detail->subscription_title == '')
         ) {
-            abort(403, 'لطفا ابتدا طرح اشتراکی را خریداری کنید');
+            abort(403, Lang::get('messages.no_plan_registered'));
         }
         if (request()->work_groups != null) {
             if (count(request()->work_groups) > $detail->subscription_count) {
-                abort(403, 'تعداد گروه های کاری انتخاب شده بیشتر از تعداد مجاز است');
+                abort(403, Lang::get('messages.more_than_limited_work_groups'));
             }
         }
         $newData = [];

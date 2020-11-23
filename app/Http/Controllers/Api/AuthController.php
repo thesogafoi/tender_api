@@ -7,6 +7,7 @@ use App\Http\Resources\UserRecourses;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 
 class AuthController extends Controller
 {
@@ -42,7 +43,7 @@ class AuthController extends Controller
     {
         Auth::logout();
 
-        return response()->json(['message' => 'خروج با موفقیت انجام شد']);
+        return response()->json(['message' => Lang::get('messages.success_logout')]);
     }
 
     public function user(Request $request)

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Lang;
 use Morilog\Jalali\Jalalian;
 
 class BannerController extends Controller
@@ -36,7 +37,7 @@ class BannerController extends Controller
             return new JsonResponse($banners);
         }
 
-        return new JsonResponse(['message' => 'There is no banner']);
+        return new JsonResponse(['message' => Lang::get('messages.no_banner')]);
     }
 
     public function index_back_office(Request $request)

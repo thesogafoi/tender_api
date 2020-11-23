@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Site;
 
 use App\ClientDetail;
+use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SiteUserResource;
 use App\Http\Resources\UserRecourses;
@@ -48,7 +49,7 @@ class SiteAuthController extends Controller
         ]);
 
         if (!Cache::has('verify_code_' . $request->mobile) || ($request->registration_code != Cache::get('verify_code_' . $request->mobile))) {
-            abort(401, 'کد وارد شده صحیح نیست یا مهلت آن به پایان رسیده است');
+            abort(401, Lang::get('messages.failed_registration'));
         }
 
         $user = new User();
@@ -100,7 +101,7 @@ class SiteAuthController extends Controller
     {
         Auth::logout();
 
-        return response()->json(['message' => 'خروج با موفقیت انجام شد']);
+        return response()->json(['message' => Lang::get('messages.success_logout')]);
     }
 
     public function user(Request $request)
@@ -110,7 +111,6 @@ class SiteAuthController extends Controller
 
     public function getVerificationCode(User $user, Request $request)
     {
-        // $this->authorize('verifyMobile', ClientDetail::class);
         $request->validate([
             'token' => 'required'
         ]);

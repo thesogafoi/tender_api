@@ -11,6 +11,7 @@ use App\Http\Resources\ShowAdvertiseResource;
 use App\Imports\AdvertiseImport;
 use App\WorkGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AdvertiseController extends Controller
@@ -145,7 +146,7 @@ class AdvertiseController extends Controller
                     foreach ($advertisesId as $advertiseId) {
                         $advertise = Advertise::where('id', $advertiseId)->first();
                         if ($request->work_groups_action == null) {
-                            abort(422, 'لطفا دسته ی کاری مورد نظر را وارد کنید');
+                            abort(422, Lang::get('messages.choose_work_groups_admin'));
                         }
                         $workGroupsRequest = [];
 
@@ -173,7 +174,7 @@ class AdvertiseController extends Controller
                     foreach ($advertisesId as $advertiseId) {
                         $advertise = Advertise::where('id', $advertiseId)->first();
                         if (count($advertise->workGroups->where('parent_id', '!=', null)) == 0) {
-                            abort(422, 'آکهی انتشار یافته نمیتواند فاقد دسته کاری باشد');
+                            abort(422, Lang::get('messages.published_advertise_without_wg'));
                         }
                         $advertise->active();
                     }
@@ -185,7 +186,7 @@ class AdvertiseController extends Controller
                         if ($advertise->workGroups && $advertise != null) {
                             $advertise->workGroups()->detach();
                         } else {
-                            abort(422, 'آگهی های انتخاب شده اشتباه است دوباره تلاش کنید');
+                            abort(422, Lang::get('messages.wrong_advertise'));
                         }
                         if ($advertise->image) {
                             if (file_exists($advertise->image)) {
@@ -196,7 +197,7 @@ class AdvertiseController extends Controller
                     }
                 break;
                 default:
-                    abort(500, 'لطفا دوباره تلاش کنید مشکلی برای سیستم بوجود آمده است');
+                    abort(500, Lang::get('messages.bad_happened'));
                     break;
             }
     }

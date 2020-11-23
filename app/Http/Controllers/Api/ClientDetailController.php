@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Morilog\Jalali\Jalalian;
 
 class ClientDetailController extends Controller
@@ -87,12 +88,12 @@ class ClientDetailController extends Controller
         && ($detail->subscription_count == 0) &&
         ($detail->subscription_title == null || $detail->subscription_title == '')
         ) {
-            abort(403, 'کاربر طرح اشتراکی ندارد');
+            abort(403, Lang::get('messages.no_plan'));
         }
         if ($request['work_groups'] == null) {
-            abort(403, 'گروه کاریی انتخاب نشده است');
+            abort(403, Lang::get('messages.no_wg'));
         } elseif ($request['work_groups'] == []) {
-            abort(403, 'گروه کاریی انتخاب نشده است');
+            abort(403, Lang::get('messages.no_wg'));
         }
 
         $newData = [];

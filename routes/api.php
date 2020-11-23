@@ -61,7 +61,7 @@ Route::delete('workgroup/delete/{workGroup}', 'Api\WorkGroupController@delete');
 
 /*************************************************************************************************** */
 
-// Privince Controller
+// Provinces Controller
 
 Route::post('province/create', 'Api\ProvinceController@create');
 Route::post('province/update/{province}', 'Api\ProvinceController@update');
